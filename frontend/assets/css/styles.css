@@ -4,6 +4,21 @@
 
 :root {
     --font-main: 'Outfit', system-ui, sans-serif;
+    --overlay-opacity: 0.5;
+    --blur-amount: 8px;
+}
+
+/* Ensure full viewport height */
+html,
+body,
+#root {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
