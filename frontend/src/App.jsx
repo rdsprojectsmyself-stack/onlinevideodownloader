@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link2, Download, CheckCircle, Loader2, Youtube, Instagram, Facebook, Command, LogOut, User } from 'lucide-react';
+import { Download, Loader2, Link2, Youtube, Instagram, Facebook, Layout, LogOut, User, Music, Disc, Search } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { auth } from './firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "firebase/auth";
 
@@ -14,7 +14,7 @@ const App = () => {
     // Downloader State
     const [url, setUrl] = useState('');
     const [processing, setProcessing] = useState(false);
-    const [status, setStatus] = useState('idle'); // idle, processing, success, error
+    const [status, setStatus] = useState('idle');
 
     // Auth Listener
     useEffect(() => {
@@ -24,6 +24,22 @@ const App = () => {
         });
         return () => unsubscribe();
     }, []);
+
+    // SEO & Title Update
+    useEffect(() => {
+        if (user) {
+            document.title = "Universal Video Downloader - Fast & Free Online HD Video Saver";
+            let metaDesc = document.querySelector('meta[name="description"]');
+            if (!metaDesc) {
+                metaDesc = document.createElement('meta');
+                metaDesc.name = "description";
+                document.head.appendChild(metaDesc);
+            }
+            metaDesc.content = "Free online video downloader to download videos from YouTube, Instagram, TikTok and more quickly and securely.";
+        } else {
+            document.title = "Login | Universal Video Downloader";
+        }
+    }, [user]);
 
     const handleLogin = async () => {
         try {
@@ -45,8 +61,7 @@ const App = () => {
         setProcessing(true);
         setStatus('processing');
 
-        // Simulate API call or Real call
-        // In a real app, you'd fetch(`${BACKEND_URL}/api/download`, ...)
+        // API Call Simulation
         setTimeout(() => {
             setProcessing(false);
             setStatus('success');
@@ -55,181 +70,201 @@ const App = () => {
 
     if (authLoading) {
         return (
-            <div className="min-h-screen w-full flex items-center justify-center bg-[#0f172a] text-white">
-                <Loader2 className="h-10 w-10 animate-spin text-violet-500" />
+            <div className="min-h-screen w-full flex items-center justify-center bg-black text-white">
+                <Loader2 className="h-10 w-10 animate-spin text-teal-500" />
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center font-sans text-slate-50">
+        <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center font-sans text-white">
 
-            {/* Background Image */}
+            {/* GLOBAL BACKGROUND */}
             <div
                 className="absolute inset-0 z-0"
                 style={{
-                    backgroundImage: `url('/assets/background.png')`,
+                    backgroundImage: `url('/background.png')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                 }}
             >
-                {/* Overlay for contrast */}
-                <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-[3px]" />
+                {/* Dark Overlay (60-70% Opacity) */}
+                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
             </div>
 
             <AnimatePresence mode="wait">
                 {!user ? (
-                    /* AUTH SCREEN */
+                    /* --- LOGIN UI (Keep Existing Premium Theme) --- */
                     <motion.div
                         key="auth"
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.4 }}
-                        className="relative z-10 w-full max-w-md px-6"
-                    >
-                        <Card className="border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl rounded-[24px] overflow-hidden border">
-                            <CardHeader className="text-center pb-8 pt-10">
-                                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 shadow-xl shadow-violet-900/30">
-                                    <Download className="h-10 w-10 text-white" />
-                                </div>
-                                <CardTitle className="text-3xl font-bold tracking-tight text-white mb-2">
-                                    Welcome Back
-                                </CardTitle>
-                                <CardDescription className="text-slate-300 text-base">
-                                    Sign in to access the Universal Downloader
-                                </CardDescription>
-                            </CardHeader>
-
-                            <CardContent className="space-y-6 pb-10 px-8">
-                                <Button
-                                    onClick={handleLogin}
-                                    className="w-full h-14 bg-white hover:bg-slate-100 text-slate-900 font-medium text-lg rounded-xl flex items-center justify-center gap-3 transition-all duration-200 hover:scale-[1.02]"
-                                >
-                                    <svg className="h-6 w-6" viewBox="0 0 24 24">
-                                        <path
-                                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                            fill="#4285F4"
-                                        />
-                                        <path
-                                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                            fill="#34A853"
-                                        />
-                                        <path
-                                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                            fill="#FBBC05"
-                                        />
-                                        <path
-                                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                            fill="#EA4335"
-                                        />
-                                    </svg>
-                                    Sign in with Google
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-                ) : (
-                    /* DOWNLOADER SCREEN */
-                    <motion.div
-                        key="app"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.5 }}
-                        className="relative z-10 w-full max-w-xl px-4"
+                        className="relative z-10 w-full max-w-[400px] px-6"
                     >
-                        {/* User Profile Header */}
-                        <div className="absolute -top-16 right-4 flex items-center gap-3">
-                            <div className="flex flex-col items-end">
-                                <span className="text-sm font-semibold text-white">{user.displayName}</span>
-                                <button onClick={handleLogout} className="text-xs text-slate-300 hover:text-white flex items-center gap-1 transition-colors">
-                                    <LogOut className="h-3 w-3" /> Sign Out
+                        <div className="relative rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-2xl overflow-hidden p-8 text-center ring-1 ring-black/5">
+                            <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-teal-500/30 blur-[60px]" />
+                            <div className="absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-blue-500/30 blur-[60px]" />
+
+                            <div className="relative z-10 flex flex-col items-center">
+                                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-white/10 border border-white/20 shadow-inner backdrop-blur-md">
+                                    <Download className="h-8 w-8 text-white drop-shadow-md" />
+                                </div>
+
+                                <h1 className="text-3xl font-bold tracking-tight text-white mb-2 drop-shadow-lg">
+                                    Universal Downloader
+                                </h1>
+                                <p className="text-white/60 text-sm mb-10 font-medium">
+                                    Login to start downloading
+                                </p>
+
+                                <button
+                                    onClick={handleLogin}
+                                    className="group relative w-full h-12 bg-white hover:bg-white/90 text-slate-800 font-semibold text-sm rounded-full flex items-center justify-center gap-3 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                                >
+                                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="h-5 w-5" />
+                                    <span>Sign in with Google</span>
                                 </button>
                             </div>
-                            <div className="h-10 w-10 rounded-full border-2 border-white/20 overflow-hidden bg-slate-700">
-                                {user.photoURL ? (
-                                    <img src={user.photoURL} alt="User" className="h-full w-full object-cover" />
-                                ) : (
-                                    <User className="h-full w-full p-2 text-slate-400" />
-                                )}
-                            </div>
                         </div>
-
-                        <Card className="border-white/10 bg-white/10 backdrop-blur-xl shadow-2xl rounded-3xl overflow-hidden">
-                            <CardHeader className="text-center pb-2">
-                                <motion.div
-                                    initial={{ scale: 0.9, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-violet-500 to-fuchsia-500 shadow-lg"
-                                >
-                                    <Download className="h-8 w-8 text-white" />
-                                </motion.div>
-                                <CardTitle className="text-3xl font-bold tracking-tight text-white drop-shadow-sm">
-                                    Universal Downloader
-                                </CardTitle>
-                                <CardDescription className="text-slate-200 text-lg font-medium">
-                                    Save videos from your favorite platforms
-                                </CardDescription>
-                            </CardHeader>
-
-                            <CardContent className="space-y-6 pt-6">
-
-                                {/* Platform Icons */}
-                                <div className="flex justify-center gap-6 text-slate-300">
-                                    <Youtube className="h-6 w-6 hover:text-white transition-colors cursor-pointer hover:scale-110" />
-                                    <Instagram className="h-6 w-6 hover:text-white transition-colors cursor-pointer hover:scale-110" />
-                                    <Facebook className="h-6 w-6 hover:text-white transition-colors cursor-pointer hover:scale-110" />
-                                    <Command className="h-6 w-6 hover:text-white transition-colors cursor-pointer hover:scale-110" />
+                    </motion.div>
+                ) : (
+                    /* --- POST-LOGIN HERO UI (New VidsSave Style) --- */
+                    <motion.div
+                        key="app"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="relative z-10 w-full h-full flex flex-col justify-between"
+                    >
+                        {/* 1. HEADER */}
+                        <header className="w-full flex justify-between items-center p-6 md:px-12 text-white/90">
+                            <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 bg-teal-500 rounded-lg flex items-center justify-center shadow-lg shadow-teal-500/20">
+                                    <Download className="h-5 w-5 text-white" />
                                 </div>
+                                <span className="font-bold tracking-tight text-lg hidden md:block">Universal Video Downloader</span>
+                            </div>
 
-                                {/* Input Section */}
-                                <div className="space-y-4">
-                                    <div className="relative group">
-                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Link2 className="h-5 w-5 text-slate-400 group-focus-within:text-violet-400 transition-colors" />
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-full pl-1 pr-4 py-1 border border-white/10">
+                                    <div className="h-8 w-8 rounded-full overflow-hidden border border-white/20">
+                                        <img src={user.photoURL || "https://ui-avatars.com/api/?name=User&background=random"} alt="User" className="h-full w-full object-cover" loading="lazy" />
+                                    </div>
+                                    <span className="text-sm font-medium hidden sm:block">{user.displayName?.split(' ')[0]}</span>
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors border border-white/10"
+                                    title="Sign Out"
+                                >
+                                    <LogOut className="h-5 w-5 text-white/80" />
+                                </button>
+                            </div>
+                        </header>
+
+                        {/* 2. HERO CONTENT */}
+                        <main className="flex-1 flex flex-col items-center justify-center px-4 -mt-20">
+                            <div className="text-center max-w-3xl mx-auto space-y-6">
+
+                                {/* H1 Heading */}
+                                <motion.h1
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.1 }}
+                                    className="text-4xl md:text-6xl font-extrabold tracking-tight text-white drop-shadow-2xl leading-tight"
+                                >
+                                    Fast & Free Online <br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-cyan-400">
+                                        Video Downloader
+                                    </span>
+                                </motion.h1>
+
+                                {/* H2 Subheading */}
+                                <motion.h2
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="text-lg md:text-xl text-white/70 font-medium max-w-2xl mx-auto"
+                                >
+                                    Download videos from YouTube, Instagram, Facebook, TikTok and more in HD quality
+                                </motion.h2>
+
+                                {/* 3. SEARCH / DOWNLOAD BAR */}
+                                <motion.div
+                                    initial={{ scale: 0.95, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ delay: 0.3 }}
+                                    className="w-full max-w-2xl mx-auto mt-8 relative group"
+                                >
+                                    <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                                    <div className="relative flex items-center bg-white/10 backdrop-blur-xl border border-white/20 p-2 rounded-2xl shadow-2xl">
+
+                                        <div className="pl-4 text-white/40">
+                                            <Link2 className="h-6 w-6" />
                                         </div>
-                                        <Input
-                                            type="url"
-                                            placeholder="Paste video URL here..."
-                                            className="pl-11 h-16 bg-black/20 border-white/10 text-white placeholder:text-slate-400 hover:bg-black/30 focus:bg-black/40 focus:border-violet-500/50 rounded-2xl transition-all duration-300 text-lg shadow-inner"
+
+                                        <input
+                                            type="text"
+                                            placeholder="Paste video link here or search"
+                                            className="flex-1 bg-transparent border-none text-white placeholder:text-white/40 focus:ring-0 text-lg px-4 h-14"
                                             value={url}
                                             onChange={(e) => setUrl(e.target.value)}
                                         />
+
+                                        <Button
+                                            onClick={handleDownload}
+                                            disabled={processing || !url}
+                                            className="h-14 px-8 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white font-bold text-lg shadow-lg shadow-teal-900/20 transition-all hover:scale-105"
+                                        >
+                                            {processing ? (
+                                                <Loader2 className="animate-spin h-6 w-6" />
+                                            ) : (
+                                                <div className="flex items-center gap-2">
+                                                    <Download className="h-5 w-5" />
+                                                    <span>Download</span>
+                                                </div>
+                                            )}
+                                        </Button>
                                     </div>
+                                </motion.div>
 
-                                    <Button
-                                        onClick={handleDownload}
-                                        disabled={processing || !url}
-                                        className="w-full h-14 text-lg font-semibold rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 shadow-lg shadow-violet-900/20 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
-                                    >
-                                        {processing ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                Processing...
-                                            </>
-                                        ) : status === 'success' ? (
-                                            <>
-                                                <CheckCircle className="mr-2 h-5 w-5" />
-                                                Ready to Download
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Download className="mr-2 h-5 w-5" />
-                                                Download Video
-                                            </>
-                                        )}
-                                    </Button>
-                                </div>
+                                {/* 4. PLATFORM ICON SECTION */}
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.5 }}
+                                    className="pt-12"
+                                >
+                                    <p className="text-white/40 text-sm font-semibold uppercase tracking-wider mb-6">
+                                        Supports the Most Popular Platforms
+                                    </p>
+                                    <div className="flex flex-wrap justify-center gap-6 md:gap-10 text-white/50">
+                                        {[
+                                            { Icon: Youtube, label: "YouTube" },
+                                            { Icon: Instagram, label: "Instagram" },
+                                            { Icon: Facebook, label: "Facebook" },
+                                            { Icon: Music, label: "TikTok" }, // Using Music for TikTok
+                                            { Icon: Layout, label: "Pinterest" },
+                                        ].map((platform, idx) => (
+                                            <div key={idx} className="flex flex-col items-center gap-2 group cursor-default">
+                                                <div className="h-12 w-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-white/10 group-hover:text-white group-hover:scale-110 transition-all duration-300">
+                                                    <platform.Icon className="h-6 w-6" />
+                                                </div>
+                                                <span className="text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">{platform.label}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
 
-                                {/* Disclaimer */}
-                                <p className="text-center text-xs text-slate-400/80 mt-4">
-                                    By using this tool, you agree to our Terms of Service. Please respect copyright laws.
-                                </p>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </main>
+
+                        {/* Footer / Copyright */}
+                        <footer className="w-full text-center py-6 text-white/20 text-xs">
+                            &copy; {new Date().getFullYear()} Universal Video Downloader. All rights reserved.
+                        </footer>
                     </motion.div>
                 )}
             </AnimatePresence>

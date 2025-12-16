@@ -8,8 +8,7 @@
 
 body {
     font-family: var(--font-main);
-    background-color: #0f172a;
-    color: white;
+    @apply bg-black text-white;
 }
 
 /* Custom adjustments if needed beyond Tailwind */
