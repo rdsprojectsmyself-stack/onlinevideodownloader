@@ -1,0 +1,1 @@
+:root{--font-main: "Outfit", system-ui, sans-serif;--overlay-opacity: .5;--blur-amount: 8px}html,body,#root{min-height:100vh;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:var(--font-main);@apply bg-black text-white;}@tailwind base;@tailwind components;@tailwind utilities;html,body,#root{height:100%;width:100%}body{margin:0}
